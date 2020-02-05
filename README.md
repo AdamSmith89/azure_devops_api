@@ -6,6 +6,7 @@ Rust wrapper around the Azure DevOps Services REST API. Provides wrappers which 
 - Add more APIs
 - [Add OAuth support](https://docs.microsoft.com/en-us/azure/devops/integrate/get-started/authentication/oauth?view=azure-devops)
   - `Bearer {access_token}` instead of `Basic {:PAT}`
+- Support custom fields
 
 # Usage
 ## Install
