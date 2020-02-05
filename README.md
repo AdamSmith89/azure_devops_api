@@ -1,19 +1,12 @@
 # azure_devops_api
 Rust wrapper around the Azure DevOps Services REST API. Provides wrappers which are split to match the services, categories and operations listed in the [API reference guide](https://docs.microsoft.com/en-us/rest/api/azure/devops/?view=azure-devops-rest-5.1).
 
-# TODO
-- Check examples are accurate and can be used as-is!
-- Add set_instance to client - is this even required?
-- Add more APIs
-- [Add OAuth support](https://docs.microsoft.com/en-us/azure/devops/integrate/get-started/authentication/oauth?view=azure-devops)
-  - `Bearer {access_token}` instead of `Basic {:PAT}`
-- Support custom fields
-
 # Usage
 ## Install
 
-```rust
-cargo install azure_devops_api
+```toml
+[dependencies]
+azure_devops_api = "0.1.0"
 ```
 
 ## Creating a Client
@@ -108,3 +101,13 @@ Therefore the query string required for the `AzureDevopsClient` would be;
 ```
 {organization}/{project}/{team}/_apis/work/teamsettings/iterations?$timeframe={$timeframe}&api-version=5.1
 ```
+
+# TODO
+- Check examples are accurate and can be used as-is!
+- Support custom fields
+- Add blocking call as well as async
+- Add features for the different services/categories?
+- Add set_instance to client - is this even required?
+- Add more APIs
+- [Add OAuth support](https://docs.microsoft.com/en-us/azure/devops/integrate/get-started/authentication/oauth?view=azure-devops)
+  - `Bearer {access_token}` instead of `Basic {:PAT}`
