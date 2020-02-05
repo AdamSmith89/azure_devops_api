@@ -89,8 +89,10 @@ Therefore the query string required for the `AzureDevopsClient` would be;
 work/teamsettings/iterations?api-version=5.1
 ```
 
-
 ## Supported APIs
 - Work
   - Iterations
     - [List](https://docs.microsoft.com/en-us/rest/api/azure/devops/work/iterations/list?view=azure-devops-rest-5.1)
+- Work Item Tracking
+  - Wiql
+    - [Query By Id](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/wiql/query%20by%20id?view=azure-devops-rest-5.1)
