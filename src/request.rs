@@ -6,7 +6,7 @@ use std::path::PathBuf;
 
 use crate::azure_devops_client::AzureDevopsClient;
 
-struct OptionalParam {
+struct Query {
     name: String,
     value: String,
 }
@@ -17,7 +17,7 @@ pub struct Request<T> {
     team: String,   // TODO: make into a list, need to then make multiple queries
     resource_path: String,
     // api version?
-    optional_params: Vec<OptionalParam>,
+    queries: Vec<Query>,
     phantom: PhantomData<T>,
 }
 
@@ -28,7 +28,7 @@ impl<T> Request<T> {
             organization: String::from(""),
             project: String::from(""),
             team: String::from(""),
-            optional_params: Vec::new(),
+            queries: Vec::new(),
             phantom: PhantomData,
         }
     }
@@ -48,6 +48,16 @@ impl<T> Request<T> {
         self
     }
 
+    pub fn add_query(mut self, name: &str, value: &str) -> Request<T> {
+        self.queries.push(Query {
+            name: name.to_owned(),
+            value: value.to_owned(),
+        });
+        self
+    }
+
+    // TODO - set api version?
+
     pub async fn send(self, client: &AzureDevopsClient) -> Result<T, reqwest::Error>
     where
         for<'de> T: Deserialize<'de>,
@@ -62,8 +72,8 @@ impl<T> Request<T> {
         uri.push("?");
 
         let mut uri = uri.to_string_lossy().to_owned().to_string();
-        for param in self.optional_params {
-            uri.push_str(&format!("{}={}&", param.name, param.value));
+        for query in self.queries {
+            uri.push_str(&format!("{}={}&", query.name, query.value));
         }
         uri.push_str("api-version=5.1");
 
@@ -72,14 +82,4 @@ impl<T> Request<T> {
         let iterations_api_response: T = raw_response.json::<T>().await?;
         Ok(iterations_api_response)
     }
-
-    pub fn optional_param(mut self, name: &str, value: &str) -> Request<T> {
-        self.optional_params.push(OptionalParam {
-            name: name.to_owned(),
-            value: value.to_owned(),
-        });
-        self
-    }
-
-    // TODO - set api version?
 }

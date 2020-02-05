@@ -38,11 +38,11 @@ pub fn list(organization: &str, project: &str) -> Request<ListIterations> {
 }
 
 pub fn get(organization: &str, project: &str, id: &str) -> Request<Iteration> {
-    let mut query = PathBuf::new();
-    query.push("work/teamsettings/iterations");
-    query.push(id);
+    let mut resource_path = PathBuf::new();
+    resource_path.push("work/teamsettings/iterations");
+    resource_path.push(id);
     
-    Request::<Iteration>::new(query.to_str().unwrap())
+    Request::<Iteration>::new(resource_path.to_str().unwrap())
         .set_organization(organization)
         .set_project(project)
 }

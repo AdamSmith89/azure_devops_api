@@ -32,10 +32,10 @@ pub struct WorkItem {
 }
 
 pub fn query_by_id(organization: &str, id: &str) -> Request<QueryResult> {
-    let mut query = PathBuf::new();
-    query.push("wit/wiql");
-    query.push(id);
+    let mut resource_path = PathBuf::new();
+    resource_path.push("wit/wiql");
+    resource_path.push(id);
     
-    Request::<QueryResult>::new(query.to_str().unwrap())
+    Request::<QueryResult>::new(resource_path.to_str().unwrap())
         .set_organization(organization)
 }
