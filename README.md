@@ -29,7 +29,7 @@ use azure_devops_api::azure_devops_client;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = azure_devops_client::AzureDevopsClient::new("pat");
+    let client = azure_devops_client::AzureDevopsClient::new("{pat}");
     
     Ok(())
 }
@@ -46,7 +46,7 @@ All wrapped APIs follow these rules;
   - Those which form part of the resource path should use `Request::set_...` functions.
   - Those which form part of the query should use the `Request::add_query` function.
 
-To demonstrate these rules we can query the list of iterations belonging to a specific team. From the [Rest API docs for this operation](https://docs.microsoft.com/en-us/rest/api/azure/devops/work/iterations/list?view=azure-devops-rest-5.1) we can see the **list** operation lives in the **Iterations** category under the **Work** service, so the wrapper is;
+To demonstrate these rules we can query the list of iterations belonging to a specific team. From the [Rest API docs for this operation](https://docs.microsoft.com/en-us/rest/api/azure/devops/work/iterations/list?view=azure-devops-rest-5.1) we can see the **List** operation lives in the **Iterations** category under the **Work** service, so the wrapper is;
 ```rust
 azure_devops_api::work::iterations::list(...)
 ```
@@ -54,12 +54,12 @@ The URL to query for a specific teams iterations is;
 ```
 https://dev.azure.com/{organization}/{project}/{team}/_apis/work/teamsettings/iterations?$timeframe={$timeframe}&api-version=5.1
 ```
-In this instance the {team} and {$timeframe} parameters are listed as optional, so the wrapper call looks as follows;
+In this instance the **team** and **$timeframe** parameters are listed as optional, so the wrapper call looks as follows;
 ```rust
 // Required parameters provided in the function call
-let list_iterations: = azure_devops_api::work::iterations::list("organization", "project")
+let list_iterations = azure_devops_api::work::iterations::list("{organization}", "{project}")
     // Optionally provide the team
-    .set_team("team")
+    .set_team("{team}")
     // Optionally provide the timeframe
     .optional_param("$timeframe", "current")
     .send(&client)
@@ -74,10 +74,10 @@ use azure_devops_api::work::iterations;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = azure_devops_client::AzureDevopsClient::new("pat");
+    let client = azure_devops_client::AzureDevopsClient::new("{pat}");
 
     // Just using the required parameters, not providing the optional "team" and "timeframe" parameters
-    let list_iterations = iterations::list("organization", "project").send(&client).await?;
+    let list_iterations = iterations::list("{organization}", "{project}").send(&client).await?;
 
     // Output some interesting information about the iterations
     for iteration in list_iterations.iterations {
