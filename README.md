@@ -46,7 +46,7 @@ All wrapped APIs follow these rules;
   - Those which form part of the resource path should use `Request::set_...` functions.
   - Those which form part of the query should use the `Request::add_query` function.
 
-To demonstrate these rules we can use query the list of iterations belonging to a specific team. From the [Rest API docs for this operation](https://docs.microsoft.com/en-us/rest/api/azure/devops/work/iterations/list?view=azure-devops-rest-5.1) we can see the **list** operation lives in the **Iterations** category under the **Work** service, so the wrapper is;
+To demonstrate these rules we can query the list of iterations belonging to a specific team. From the [Rest API docs for this operation](https://docs.microsoft.com/en-us/rest/api/azure/devops/work/iterations/list?view=azure-devops-rest-5.1) we can see the **list** operation lives in the **Iterations** category under the **Work** service, so the wrapper is;
 ```rust
 azure_devops_api::work::iterations::list(...)
 ```
