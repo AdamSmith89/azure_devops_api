@@ -10,7 +10,8 @@ use crate::request::Request;
 #[serde(rename_all = "camelCase")]
 pub struct ListIterations {
     pub count: i64,
-    pub value: Vec<Iteration>,
+    #[serde(rename = "value")]
+    pub iterations: Vec<Iteration>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]

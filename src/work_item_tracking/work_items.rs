@@ -12,7 +12,8 @@ use crate::request::Request;
 #[serde(rename_all = "camelCase")]
 pub struct ListWorkItems {
     pub count: i64,
-    pub value: Vec<Value>,
+    #[serde(rename = "value")]
+    pub work_items: Vec<Value>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
