@@ -30,7 +30,9 @@ use azure_devops_api::azure_devops_client;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = azure_devops_client::AzureDevopsClient::new("pat") // Authorization, extend?
         // Optional - defaults to https://dev-azure.com
-        .set_instance("https://dev-azure.com") // NOT IMPLEMENTED YET : even required? tfs requires different mappings so would be more work
+        .set_instance("https://dev-azure.com"); // NOT IMPLEMENTED YET : even required? tfs requires different mappings so would be more work
+    
+    Ok(())
 }
 ```
 ### Authorization Methods
