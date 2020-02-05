@@ -27,20 +27,9 @@ use azure_devops_api::azure_devops_client;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = azure_devops_client::AzureDevopsClient::new("pat") // PAT specified here for now
-        // An auth method is required - maybe this should be in the constructor then?
-        .set_authorization(azure_devops_api::PAT, "pat") // NOT IMPLEMENTED YET
-        // Optional - can be defaulted here for all queries
-        // or overriden in each query
-        .set_organization("organization")
-        // Optional - can be defaulted here for all queries
-        // or overriden in each query
-        .set_project("project")
-        // Optional - can be defaulted here for all queries
-        // or overriden in each query
-        .set_teams("team1") // OR .set_teams(["team1"]) // NOT IMPLEMENTED YET
-        // Optional (will default to latest stable, 5.1) - maybe make this a per-query thing? Or override-able per query?
-        .set_api_version(azure_devops_api::FIVE_ONE); // NOT IMPLEMENTED YET
+    let client = azure_devops_client::AzureDevopsClient::new("pat") // Authorization, extend?
+        // Optional - defaults to https://dev-azure.com
+        .set_instance("https://dev-azure.com") // NOT IMPLEMENTED YET : even required? tfs requires different mappings so would be more work
 }
 ```
 ### Authorization Methods
@@ -54,20 +43,15 @@ use azure_devops_api::work::iterations;
 // setup client as above...
 
 // Basic query example
-let iterations: iterations::ListIterations = iterations::list().send(&client).await?;
+// "Iterations - List" api requires an organization and project.
+let iterations: iterations::ListIterations = iterations::list("organization", "project").send(&client).await?;
 
-// Example of using an optional parameter
-let iterations: iterations::ListIterations = iterations::list()
+// "Iterations - List" api can optionally be provided a team and also further query parameters
+let iterations: iterations::ListIterations = iterations::list("organization", "project")
+    .set_team("team")
     .optional_param("$timeframe", "current")
     .send(&client)
     .await?;
-
-// Example of overriding config of AzureDevopsClient on a per-request basis : NOT IMPLEMENTED YET
-let iterations: iterations::ListIterations = iterations::list()
-    .set_organization("organization")
-    .set_project("project")
-    .set_teams(["team1"])
-    .send(&client).await?;
 
 // Output some interesting information about the iterations
 for iteration in iterations.value {
@@ -77,16 +61,14 @@ for iteration in iterations.value {
 <br>If required then a raw queries can be performed through the `AzureDevopsClient` itself.
 ```rust
 let raw_json: String = client.get("api_query").await?;
-// Example of overriding config of AzureDevopsClient - NOT IMPLEMENTED YET
-let raw_json: String = client.get("organization", "project", ["team1"], "api_query").await?;
 ```
-<br>The `api_query` should be everything after "_apis". For example, the URL for listing iterations is;
+<br>The `api_query` should be everything after the instance. For example, the URL for listing iterations is;
 ```
 https://dev.azure.com/{organization}/{project}/{team}/_apis/work/teamsettings/iterations?api-version=5.1
 ```
 Therefore the query string required for the `AzureDevopsClient` would be;
 ```
-work/teamsettings/iterations?api-version=5.1
+{organization}/{project}/{team}/_apis/work/teamsettings/iterations?api-version=5.1
 ```
 
 ## Supported APIs

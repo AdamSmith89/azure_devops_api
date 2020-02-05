@@ -31,10 +31,11 @@ pub struct WorkItem {
     pub url: String,
 }
 
-pub fn query_by_id(id: &str) -> Request<QueryResult> {
+pub fn query_by_id(organization: &str, id: &str) -> Request<QueryResult> {
     let mut query = PathBuf::new();
     query.push("wit/wiql");
     query.push(id);
     
     Request::<QueryResult>::new(query.to_str().unwrap())
+        .set_organization(organization)
 }

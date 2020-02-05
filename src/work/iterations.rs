@@ -31,14 +31,18 @@ pub struct Attributes {
     pub time_frame: String,
 }
 
-pub fn list() -> Request<ListIterations> {
+pub fn list(organization: &str, project: &str) -> Request<ListIterations> {
     Request::<ListIterations>::new("work/teamsettings/iterations")
+        .set_organization(organization)
+        .set_project(project)
 }
 
-pub fn get(id: &str) -> Request<Iteration> {
+pub fn get(organization: &str, project: &str, id: &str) -> Request<Iteration> {
     let mut query = PathBuf::new();
     query.push("work/teamsettings/iterations");
     query.push(id);
     
     Request::<Iteration>::new(query.to_str().unwrap())
+        .set_organization(organization)
+        .set_project(project)
 }
