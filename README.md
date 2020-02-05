@@ -81,3 +81,5 @@ Therefore the query string required for the `AzureDevopsClient` would be;
 - Work Item Tracking
   - Wiql
     - [Query By Id](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/wiql/query%20by%20id?view=azure-devops-rest-5.1)
+  - Work Items
+    - [List](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/work%20items/list?view=azure-devops-rest-5.1)
