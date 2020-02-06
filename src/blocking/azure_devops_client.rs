@@ -5,7 +5,6 @@ use url::Url;
 pub struct AzureDevopsClient {
     pat: String,
     client: reqwest::blocking::Client,
-    //client: reqwest::blocking::Client,
 }
 
 impl AzureDevopsClient {
@@ -16,7 +15,6 @@ impl AzureDevopsClient {
         }
     }
 
-    //pub async fn get(&self, query: String) -> Result<reqwest::Response, reqwest::Error> {
     pub fn get(&self, query: String) -> Result<reqwest::blocking::Response, reqwest::Error> {
         let mut uri = PathBuf::new();
         uri.push("https://dev.azure.com");
@@ -35,7 +33,6 @@ impl AzureDevopsClient {
             .header(reqwest::header::AUTHORIZATION, auth_header)
             .header(reqwest::header::CONTENT_TYPE, "application/json")
             .send()?)
-            //.await?)
     }
 
     // TODO: add support for POST

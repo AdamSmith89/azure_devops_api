@@ -1,6 +1,15 @@
-// Use mod to bring module into scope
-// Use pub to make it accessible outside of this crate
-pub mod azure_devops_client;
-pub mod request;
+pub mod _async;
+pub mod blocking;
+pub mod request_trait;
 pub mod work;
 pub mod work_item_tracking;
+
+
+
+fn foo() {
+    let client = blocking::azure_devops_client::AzureDevopsClient::new("1234");
+
+    let list_iterations = work::iterations::list("Avecto-VSTS", "PrivilegeGuard")
+        .set_team("Client Team Axolotl")
+        .send(&client).unwrap();
+}

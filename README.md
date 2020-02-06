@@ -17,7 +17,6 @@ tokio = { version = "0.2.11", features = ["macros"] }
 ```
 Example of creating a client in an async `main`.
 ```rust
-extern crate azure_devops_api;
 use azure_devops_api::azure_devops_client;
 
 #[tokio::main]
@@ -61,7 +60,6 @@ let list_iterations = azure_devops_api::work::iterations::list("{organization}",
 The wrappers return deserialized JSON that map the default fields returned by the API.
 ## Full Example
 ```rust
-extern crate azure_devops_api;
 use azure_devops_api::azure_devops_client;
 use azure_devops_api::work::iterations;
 
