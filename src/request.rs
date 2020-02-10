@@ -58,8 +58,7 @@ impl<T> Request<T> {
 
     // TODO - set api version?
 
-    //pub async fn send(self, client: &AzureDevopsClient) -> Result<T, reqwest::Error>
-    pub fn send(self, client: &AzureDevopsClient) -> Result<T, reqwest::Error>
+    pub async fn send(self, client: &AzureDevopsClient) -> Result<T, reqwest::Error>
     where
         for<'de> T: Deserialize<'de>,
     {
@@ -79,8 +78,8 @@ impl<T> Request<T> {
         uri.push_str("api-version=5.1");
 
         // This is all that belongs in send
-        let raw_response = client.get(uri)?;//.await?;
-        let iterations_api_response: T = raw_response.json::<T>()?;//.await?;
+        let raw_response = client.get(uri).await?;
+        let iterations_api_response: T = raw_response.json::<T>().await?;
         Ok(iterations_api_response)
     }
 }

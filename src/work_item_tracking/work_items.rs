@@ -1,3 +1,4 @@
+extern crate reqwest;
 extern crate serde;
 use serde::Deserialize;
 
