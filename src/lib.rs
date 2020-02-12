@@ -1,6 +1,6 @@
 pub mod _async;
 pub mod blocking;
-pub mod request_trait;
+pub mod request;
 pub mod work;
 pub mod work_item_tracking;
 

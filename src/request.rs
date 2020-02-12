@@ -1,11 +1,11 @@
 use std::marker::PhantomData;
 
-struct Query {
+struct Request {
     name: String,
     value: String,
 }
 
-pub struct RequestSuper<T> {
+pub struct RequestBuilder<T> {
     organization: String,
     project: String,
     team: String,   // TODO: make into a list, need to then make multiple queries
@@ -15,7 +15,7 @@ pub struct RequestSuper<T> {
     phantom: PhantomData<T>,
 }
 
-impl<T> RequestSuper<T> {
+impl<T> RequestBuilder<T> {
     pub fn new(resource_path: &str) -> RequestSuper<T> {
         RequestSuper {
             resource_path: resource_path.to_owned(),
