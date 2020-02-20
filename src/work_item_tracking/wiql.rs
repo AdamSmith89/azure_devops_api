@@ -1,7 +1,4 @@
-extern crate reqwest;
-extern crate serde;
 use serde::Deserialize;
-
 use std::path::PathBuf;
 
 use crate::request::Request;

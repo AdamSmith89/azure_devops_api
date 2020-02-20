@@ -1,7 +1,4 @@
-extern crate reqwest;
-extern crate serde;
 use serde::Deserialize;
-
 use std::path::PathBuf;
 
 use crate::request::Request;
@@ -42,7 +39,6 @@ pub fn get(organization: &str, project: &str, id: &str) -> Request<Iteration> {
     let mut resource_path = PathBuf::new();
     resource_path.push("work/teamsettings/iterations");
     resource_path.push(id);
-    
     Request::<Iteration>::new(resource_path.to_str().unwrap())
         .set_organization(organization)
         .set_project(project)
