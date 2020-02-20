@@ -1,12 +1,7 @@
-extern crate reqwest;
-extern crate serde;
 use serde::Deserialize;
-
 use std::path::PathBuf;
 
 use crate::request::Request;
-
-// TODO: How do we make the custom fields generic???
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -177,16 +172,14 @@ pub struct CommentVersionRef {
     pub url: String,
 }
 
-
 // Potential helper taking a vector of ints?
 //pub fn list(organization: &str, ids: Vec<i32>) -> Request<ListWorkItems> {
-    //.add_query("ids", ids.iter().map(|id| id.to_string()).collect::<Vec<String>>().join(","))
+//.add_query("ids", ids.iter().map(|id| id.to_string()).collect::<Vec<String>>().join(","))
 
 // ids should be in CSV format
 pub fn list(organization: &str, ids: String) -> Request<ListWorkItems> {
     let mut resource_path = PathBuf::new();
     resource_path.push("wit/workitems");
-    
     Request::<ListWorkItems>::new(resource_path.to_str().unwrap())
         .set_organization(organization)
         .add_query("ids", ids.as_str())

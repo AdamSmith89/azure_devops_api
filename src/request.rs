@@ -1,10 +1,9 @@
-extern crate serde;
 use serde::Deserialize;
-
 use std::marker::PhantomData;
 use std::path::PathBuf;
 
 use crate::azure_devops_client::AzureDevopsClient;
+use crate::errors::ApiError;
 
 struct Query {
     name: String,
@@ -58,7 +57,7 @@ impl<T> Request<T> {
 
     // TODO - set api version?
 
-    pub async fn send(self, client: &AzureDevopsClient) -> Result<T, reqwest::Error>
+    pub fn send(self, client: &AzureDevopsClient) -> Result<T, ApiError>
     where
         for<'de> T: Deserialize<'de>,
     {
@@ -71,15 +70,18 @@ impl<T> Request<T> {
         uri.push(&self.resource_path);
         uri.push("?");
 
-        let mut uri = uri.to_string_lossy().to_owned().to_string();
+        let mut uri = uri.to_string_lossy().into_owned();
         for query in self.queries {
             uri.push_str(&format!("{}={}&", query.name, query.value));
         }
         uri.push_str("api-version=5.1");
 
-        // This is all that belongs in send
-        let raw_response = client.get(uri).await?;
-        let iterations_api_response: T = raw_response.json::<T>().await?;
-        Ok(iterations_api_response)
+        let response = client.get(uri)?;
+
+        if let Err(err) = response.error_for_status_ref() {
+            return Err(err)?;
+        }
+
+        Ok(response.json::<T>()?)
     }
 }
