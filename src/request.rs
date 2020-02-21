@@ -10,6 +10,7 @@ use crate::errors::ApiError;
 pub struct Request<T> {
     url: Url,
     phantom: PhantomData<T>,
+    // type: Get/Post?
 }
 
 impl<T> Request<T> {
@@ -42,8 +43,9 @@ struct Query {
 pub struct RequestBuilder<T> {
     organization: String,
     project: String,
-    team: String, // TODO: make into a list, need to then make multiple queries
+    team: String,
     resource_path: String,
+    // type: Get/Post
     // api version?
     queries: Vec<Query>,
     phantom: PhantomData<T>,
@@ -118,6 +120,9 @@ impl<T> RequestBuilder<T> {
 #[cfg(test)]
 mod tests {
     use super::RequestBuilder;
+    
+    // TODO: Some tests for fail cases would be good
+
     #[test]
     fn requestbuilder_build_basic() {
         let request_builder = RequestBuilder::<i32>::new("fake_path");
@@ -130,13 +135,24 @@ mod tests {
     }
 
     #[test]
-    fn requestbuilder_build_with_organization() {
+    fn requestbuilder_build_with_organization_only() {
         let request_builder = RequestBuilder::<i32>::new("fake_path").set_organization("fake_org");
         let actual_request = request_builder.build();
 
         assert_eq!(
             actual_request.unwrap().url.as_str(),
             "https://dev.azure.com/fake_org/_apis/fake_path?api-version=5.1"
+        );
+    }
+
+    #[test]
+    fn requestbuilder_build_with_team_only() {
+        let request_builder = RequestBuilder::<i32>::new("fake_path").set_team("fake_team");
+        let actual_request = request_builder.build();
+
+        assert_eq!(
+            actual_request.unwrap().url.as_str(),
+            "https://dev.azure.com/fake_team/_apis/fake_path?api-version=5.1"
         );
     }
 
@@ -176,6 +192,22 @@ mod tests {
         assert_eq!(
             actual_request.unwrap().url.as_str(),
             "https://dev.azure.com/_apis/fake_path?fake_query1=fake_value1&fake_query2=fake_value2&fake_query3=fake_value3&api-version=5.1"
+        );
+    }
+
+    #[test]
+    fn requestbuilder_build_all_segments() {
+        let request_builder = RequestBuilder::<i32>::new("fake_path")
+            .set_organization("fake_org")
+            .set_team("fake_team")
+            .add_query("fake_query1", "fake_value1")
+            .add_query("fake_query2", "fake_value2")
+            .add_query("fake_query3", "fake_value3");
+        let actual_request = request_builder.build();
+
+        assert_eq!(
+            actual_request.unwrap().url.as_str(),
+            "https://dev.azure.com/fake_org/fake_team/_apis/fake_path?fake_query1=fake_value1&fake_query2=fake_value2&fake_query3=fake_value3&api-version=5.1"
         );
     }
 }
