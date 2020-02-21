@@ -10,25 +10,20 @@ azure_devops_api = "0.1.0"
 ```
 
 ## Creating a Client
-Currently only supports async communication, suggested approach is to use `tokio`.
-```toml
-[dependencies]
-tokio = { version = "0.2.11", features = ["macros"] } 
-```
-Example of creating a client in an async `main`.
+
 ```rust
 extern crate azure_devops_api;
 use azure_devops_api::azure_devops_client;
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() {
     let client = azure_devops_client::AzureDevopsClient::new("{pat}");
-    
-    Ok(())
 }
 ```
-### Authorization Methods
-- Authorization via PAT is currently the only supported method.
+### Authorization
+Authorization via PAT is currently the only supported method.
+
+### Synchronicity
+Currently only supports blocking requests.
 
 ## Queries
 All wrapped APIs follow these rules;
@@ -51,34 +46,33 @@ In this instance the **team** and **$timeframe** parameters are listed as option
 ```rust
 // Required parameters provided in the function call
 let list_iterations = azure_devops_api::work::iterations::list("{organization}", "{project}")
-    // Optionally provide the team
+    // Optionally provide the team - forms part of the resource path so uses a "set_..." function
     .set_team("{team}")
-    // Optionally provide the timeframe
-    .optional_param("$timeframe", "current")
-    .send(&client)
-    .await?;
+    // Optionally provide the timeframe - is a query so uses the "add_query" function
+    .add_query("$timeframe", "current")
+    .send(&client)?;
 ```
-The wrappers return deserialized JSON that map the default fields returned by the API.
+The wrappers return deserialized JSON that maps the default fields returned by the API.
 ## Full Example
 ```rust
 extern crate azure_devops_api;
-use azure_devops_api::azure_devops_client;
+use azure_devops_api::azure_devops_client::AzureDevopsClient;
 use azure_devops_api::work::iterations;
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = azure_devops_client::AzureDevopsClient::new("{pat}");
+fn main() {
+    let client = AzureDevopsClient::new("{pat}");
 
     // Just using the required parameters, not providing the optional "team" and "timeframe" parameters
-    let list_iterations = iterations::list("{organization}", "{project}").send(&client).await?;
+    let list_iterations = iterations::list("{organization}", "{project}").send(&client).unwrap();
 
     // Output some interesting information about the iterations
     for iteration in list_iterations.iterations {
         println!("{} : {} -> {}", iteration.name, iteration.attributes.start_date, iteration.attributes.finish_date);
     }
-    Ok(())
 }
 ```
+## Errors
+??
 ## Supported APIs
 - Work
   - Iterations
@@ -91,23 +85,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ## Unsupported APIs
 APIs that have yet to be supported can be performed directly through the `AzureDevopsClient` itself. Deserialization will have to be performed manually.
 ```rust
-let raw_json: String = client.get("api_query").await?;
+let json: some_struct = client.get(Url::parse("https://dev.azure.com/...")?)?.json()?;
 ```
-The `api_query` should be everything after the instance. Using the list iterations operation as an example again, the URL for listing iterations is;
-```
-https://dev.azure.com/{organization}/{project}/{team}/_apis/work/teamsettings/iterations?$timeframe={$timeframe}&api-version=5.1
-```
-Therefore the query string required for the `AzureDevopsClient` would be;
-```
-{organization}/{project}/{team}/_apis/work/teamsettings/iterations?$timeframe={$timeframe}&api-version=5.1
-```
+The `get` method takes a `url::Url` and returns a `Result<reqwest::blocking::response, ApiError>`. The [reqwest](https://crates.io/crates/reqwest) library supports deserialization through [serde_json](https://crates.io/crates/serde_json) using the `json` function.
 
 # TODO
-- Check examples are accurate and can be used as-is!
+- Add support for post
 - Support custom fields
-- Add blocking call as well as async
 - Add features for the different services/categories?
-- Add set_instance to client - is this even required?
 - Add more APIs
 - [Add OAuth support](https://docs.microsoft.com/en-us/azure/devops/integrate/get-started/authentication/oauth?view=azure-devops)
   - `Bearer {access_token}` instead of `Basic {:PAT}`
