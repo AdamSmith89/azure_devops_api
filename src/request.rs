@@ -1,24 +1,21 @@
 use serde::Deserialize;
 use std::marker::PhantomData;
-use std::path::PathBuf;
+use std::ops::Add;
+use url::Url;
 
 use crate::azure_devops_client::AzureDevopsClient;
 use crate::errors::ApiError;
 
-struct Query {
-    name: String,
-    value: String,
-}
-
+#[derive(Debug)]
 pub struct Request<T> {
-    url: String,
+    url: Url,
     phantom: PhantomData<T>,
 }
 
 impl<T> Request<T> {
-    pub fn new(url: &str) -> Request<T> {
+    pub fn new(url: Url) -> Request<T> {
         Request {
-            url: url.to_owned(),
+            url: url,
             phantom: PhantomData,
         }
     }
@@ -37,10 +34,15 @@ impl<T> Request<T> {
     }
 }
 
+struct Query {
+    name: String,
+    value: String,
+}
+
 pub struct RequestBuilder<T> {
     organization: String,
     project: String,
-    team: String,   // TODO: make into a list, need to then make multiple queries
+    team: String, // TODO: make into a list, need to then make multiple queries
     resource_path: String,
     // api version?
     queries: Vec<Query>,
@@ -60,17 +62,17 @@ impl<T> RequestBuilder<T> {
     }
 
     pub fn set_organization(mut self, organization: &str) -> RequestBuilder<T> {
-        self.organization = organization.to_owned();
+        self.organization = organization.to_owned().add("/");
         self
     }
 
     pub fn set_project(mut self, project: &str) -> RequestBuilder<T> {
-        self.project = project.to_owned();
+        self.project = project.to_owned().add("/");
         self
     }
 
     pub fn set_team(mut self, team: &str) -> RequestBuilder<T> {
-        self.team = team.to_owned();
+        self.team = team.to_owned().add("/");
         self
     }
 
@@ -84,22 +86,24 @@ impl<T> RequestBuilder<T> {
 
     // TODO - set api version?
 
-    pub fn build(self) -> Request<T> {
-        let mut url = PathBuf::new();
-        url.push(&self.organization);
-        url.push(&self.project);
-        url.push(&self.team);
-        url.push("_apis");
-        url.push(&self.resource_path);
-        url.push("?");
+    pub fn build(mut self) -> Result<Request<T>, ApiError> {
+        self.queries.push(Query {
+            name: String::from("api-version"),
+            value: String::from("5.1"),
+        });
 
-        let mut url = url.to_string_lossy().into_owned();
+        let mut url = Url::parse("https://dev.azure.com")?
+            .join(&self.organization)?
+            .join(&self.project)?
+            .join(&self.team)?
+            .join("_apis/")?
+            .join(&self.resource_path)?;
+
         for query in self.queries {
-            url.push_str(&format!("{}={}&", query.name, query.value));
+            url.query_pairs_mut().append_pair(&query.name, &query.value);
         }
-        url.push_str("api-version=5.1");
 
-        Request::new(url.as_str())
+        Ok(Request::new(url))
     }
 
     // Shortcut to call .build() then Request::Send()
@@ -107,6 +111,71 @@ impl<T> RequestBuilder<T> {
     where
         for<'de> T: Deserialize<'de>,
     {
-        self.build().send(client)
+        self.build()?.send(client)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::RequestBuilder;
+    #[test]
+    fn requestbuilder_build_basic() {
+        let request_builder = RequestBuilder::<i32>::new("fake_path");
+        let actual_request = request_builder.build();
+
+        assert_eq!(
+            actual_request.unwrap().url.as_str(),
+            "https://dev.azure.com/_apis/fake_path?api-version=5.1"
+        );
+    }
+
+    #[test]
+    fn requestbuilder_build_with_organization() {
+        let request_builder = RequestBuilder::<i32>::new("fake_path").set_organization("fake_org");
+        let actual_request = request_builder.build();
+
+        assert_eq!(
+            actual_request.unwrap().url.as_str(),
+            "https://dev.azure.com/fake_org/_apis/fake_path?api-version=5.1"
+        );
+    }
+
+    #[test]
+    fn requestbuilder_build_with_organization_and_team() {
+        let request_builder = RequestBuilder::<i32>::new("fake_path")
+            .set_organization("fake_org")
+            .set_team("fake_team");
+        let actual_request = request_builder.build();
+
+        assert_eq!(
+            actual_request.unwrap().url.as_str(),
+            "https://dev.azure.com/fake_org/fake_team/_apis/fake_path?api-version=5.1"
+        );
+    }
+
+    #[test]
+    fn requestbuilder_build_with_query() {
+        let request_builder =
+            RequestBuilder::<i32>::new("fake_path").add_query("fake_query", "fake_value");
+        let actual_request = request_builder.build();
+
+        assert_eq!(
+            actual_request.unwrap().url.as_str(),
+            "https://dev.azure.com/_apis/fake_path?fake_query=fake_value&api-version=5.1"
+        );
+    }
+
+    #[test]
+    fn requestbuilder_build_with_multiple_queries() {
+        let request_builder = RequestBuilder::<i32>::new("fake_path")
+            .add_query("fake_query1", "fake_value1")
+            .add_query("fake_query2", "fake_value2")
+            .add_query("fake_query3", "fake_value3");
+        let actual_request = request_builder.build();
+
+        assert_eq!(
+            actual_request.unwrap().url.as_str(),
+            "https://dev.azure.com/_apis/fake_path?fake_query1=fake_value1&fake_query2=fake_value2&fake_query3=fake_value3&api-version=5.1"
+        );
     }
 }

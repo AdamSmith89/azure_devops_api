@@ -1,4 +1,3 @@
-use std::path::PathBuf;
 use url::Url;
 
 use crate::errors::ApiError;
@@ -19,18 +18,12 @@ impl AzureDevopsClient {
         }
     }
 
-    pub fn get(&self, query: String) -> Result<reqwest::blocking::Response, ApiError> {
-        let mut uri = PathBuf::new();
-        uri.push("https://dev.azure.com");
-        uri.push(query);
-
-        let uri = Url::parse(uri.to_string_lossy().into_owned().as_str())?;
-
+    pub fn get(&self, url: Url) -> Result<reqwest::blocking::Response, ApiError> {
         let pat = ":".to_owned() + &self.pat;
         let auth_header = "Basic ".to_owned() + &base64::encode(&pat);
 
         Ok(self.client
-            .get(uri.as_str())
+            .get(url.as_str())
             .header(reqwest::header::AUTHORIZATION, auth_header)
             .header(reqwest::header::CONTENT_TYPE, "application/json")
             .send()?)
