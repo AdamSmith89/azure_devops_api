@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use std::path::PathBuf;
 
-use crate::request::Request;
+use crate::request::RequestBuilder;
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -29,17 +29,17 @@ pub struct Attributes {
     pub time_frame: String,
 }
 
-pub fn list(organization: &str, project: &str) -> Request<ListIterations> {
-    Request::<ListIterations>::new("work/teamsettings/iterations")
+pub fn list(organization: &str, project: &str) -> RequestBuilder<ListIterations> {
+    RequestBuilder::<ListIterations>::new("work/teamsettings/iterations")
         .set_organization(organization)
         .set_project(project)
 }
 
-pub fn get(organization: &str, project: &str, id: &str) -> Request<Iteration> {
+pub fn get(organization: &str, project: &str, id: &str) -> RequestBuilder<Iteration> {
     let mut resource_path = PathBuf::new();
     resource_path.push("work/teamsettings/iterations");
     resource_path.push(id);
-    Request::<Iteration>::new(resource_path.to_str().unwrap())
+    RequestBuilder::<Iteration>::new(resource_path.to_str().unwrap())
         .set_organization(organization)
         .set_project(project)
 }

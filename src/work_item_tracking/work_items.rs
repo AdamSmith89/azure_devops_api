@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use std::path::PathBuf;
 
-use crate::request::Request;
+use crate::request::RequestBuilder;
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -177,10 +177,10 @@ pub struct CommentVersionRef {
 //.add_query("ids", ids.iter().map(|id| id.to_string()).collect::<Vec<String>>().join(","))
 
 // ids should be in CSV format
-pub fn list(organization: &str, ids: String) -> Request<ListWorkItems> {
+pub fn list(organization: &str, ids: String) -> RequestBuilder<ListWorkItems> {
     let mut resource_path = PathBuf::new();
     resource_path.push("wit/workitems");
-    Request::<ListWorkItems>::new(resource_path.to_str().unwrap())
+    RequestBuilder::<ListWorkItems>::new(resource_path.to_str().unwrap())
         .set_organization(organization)
         .add_query("ids", ids.as_str())
 }

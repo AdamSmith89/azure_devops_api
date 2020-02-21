@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use std::path::PathBuf;
 
-use crate::request::Request;
+use crate::request::RequestBuilder;
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -28,11 +28,11 @@ pub struct WorkItem {
     pub url: String,
 }
 
-pub fn query_by_id(organization: &str, id: &str) -> Request<QueryResult> {
+pub fn query_by_id(organization: &str, id: &str) -> RequestBuilder<QueryResult> {
     let mut resource_path = PathBuf::new();
     resource_path.push("wit/wiql");
     resource_path.push(id);
     
-    Request::<QueryResult>::new(resource_path.to_str().unwrap())
+    RequestBuilder::<QueryResult>::new(resource_path.to_str().unwrap())
         .set_organization(organization)
 }
