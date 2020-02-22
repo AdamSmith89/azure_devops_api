@@ -7,15 +7,22 @@ use crate::azure_devops_client::AzureDevopsClient;
 use crate::errors::ApiError;
 
 #[derive(Debug)]
+pub enum Method {
+    Get,
+    Post,
+}
+
+#[derive(Debug)]
 pub struct Request<T> {
+    method: Method,
     url: Url,
     phantom: PhantomData<T>,
-    // type: Get/Post?
 }
 
 impl<T> Request<T> {
-    pub fn new(url: Url) -> Request<T> {
+    pub fn new(method: Method, url: Url) -> Request<T> {
         Request {
+            method: method,
             url: url,
             phantom: PhantomData,
         }
@@ -41,19 +48,20 @@ struct Query {
 }
 
 pub struct RequestBuilder<T> {
+    method: Method,
     organization: String,
     project: String,
     team: String,
     resource_path: String,
-    // type: Get/Post
     // api version?
     queries: Vec<Query>,
     phantom: PhantomData<T>,
 }
 
 impl<T> RequestBuilder<T> {
-    pub fn new(resource_path: &str) -> RequestBuilder<T> {
+    pub fn new(method: Method, resource_path: &str) -> RequestBuilder<T> {
         RequestBuilder {
+            method: method,
             resource_path: resource_path.to_owned(),
             organization: String::from(""),
             project: String::from(""),
@@ -105,7 +113,7 @@ impl<T> RequestBuilder<T> {
             url.query_pairs_mut().append_pair(&query.name, &query.value);
         }
 
-        Ok(Request::new(url))
+        Ok(Request::new(self.method, url))
     }
 
     // Shortcut to call .build() then Request::Send()
@@ -119,13 +127,14 @@ impl<T> RequestBuilder<T> {
 
 #[cfg(test)]
 mod tests {
+    use super::Method;
     use super::RequestBuilder;
     
     // TODO: Some tests for fail cases would be good
 
     #[test]
     fn requestbuilder_build_basic() {
-        let request_builder = RequestBuilder::<i32>::new("fake_path");
+        let request_builder = RequestBuilder::<i32>::new(Method::Get, "fake_path");
         let actual_request = request_builder.build();
 
         assert_eq!(
@@ -136,7 +145,7 @@ mod tests {
 
     #[test]
     fn requestbuilder_build_with_organization_only() {
-        let request_builder = RequestBuilder::<i32>::new("fake_path").set_organization("fake_org");
+        let request_builder = RequestBuilder::<i32>::new(Method::Get, "fake_path").set_organization("fake_org");
         let actual_request = request_builder.build();
 
         assert_eq!(
@@ -147,7 +156,7 @@ mod tests {
 
     #[test]
     fn requestbuilder_build_with_team_only() {
-        let request_builder = RequestBuilder::<i32>::new("fake_path").set_team("fake_team");
+        let request_builder = RequestBuilder::<i32>::new(Method::Get, "fake_path").set_team("fake_team");
         let actual_request = request_builder.build();
 
         assert_eq!(
@@ -158,7 +167,7 @@ mod tests {
 
     #[test]
     fn requestbuilder_build_with_organization_and_team() {
-        let request_builder = RequestBuilder::<i32>::new("fake_path")
+        let request_builder = RequestBuilder::<i32>::new(Method::Get, "fake_path")
             .set_organization("fake_org")
             .set_team("fake_team");
         let actual_request = request_builder.build();
@@ -172,7 +181,7 @@ mod tests {
     #[test]
     fn requestbuilder_build_with_query() {
         let request_builder =
-            RequestBuilder::<i32>::new("fake_path").add_query("fake_query", "fake_value");
+            RequestBuilder::<i32>::new(Method::Get, "fake_path").add_query("fake_query", "fake_value");
         let actual_request = request_builder.build();
 
         assert_eq!(
@@ -183,7 +192,7 @@ mod tests {
 
     #[test]
     fn requestbuilder_build_with_multiple_queries() {
-        let request_builder = RequestBuilder::<i32>::new("fake_path")
+        let request_builder = RequestBuilder::<i32>::new(Method::Get, "fake_path")
             .add_query("fake_query1", "fake_value1")
             .add_query("fake_query2", "fake_value2")
             .add_query("fake_query3", "fake_value3");
@@ -197,7 +206,7 @@ mod tests {
 
     #[test]
     fn requestbuilder_build_all_segments() {
-        let request_builder = RequestBuilder::<i32>::new("fake_path")
+        let request_builder = RequestBuilder::<i32>::new(Method::Get, "fake_path")
             .set_organization("fake_org")
             .set_team("fake_team")
             .add_query("fake_query1", "fake_value1")
