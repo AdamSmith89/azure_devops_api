@@ -1,8 +1,9 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
-use crate::request::RequestBuilder;
+use crate::errors::ApiError;
 use crate::request::Method;
+use crate::request::RequestBuilder;
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -12,7 +13,7 @@ pub struct ListIterations {
     pub iterations: Vec<Iteration>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Iteration {
     pub id: String,
@@ -22,7 +23,7 @@ pub struct Iteration {
     pub url: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Attributes {
     pub start_date: Option<String>,
@@ -44,3 +45,18 @@ pub fn get(organization: &str, project: &str, id: &str) -> RequestBuilder<Iterat
         .set_organization(organization)
         .set_project(project)
 }
+
+pub fn post_team_iteration(
+    organization: &str,
+    project: &str,
+    id: &str,
+) -> Result<RequestBuilder<Iteration>, ApiError> {
+    Ok(
+        RequestBuilder::<Iteration>::new(Method::Post, "work/teamsettings/iterations")
+            .set_organization(organization)
+            .set_project(project)
+            .set_body(format!("{{\"id\":\"{}\"}}", id).as_str())
+            //serde_json::to_string(&iteration)?.as_str()
+    )
+}
+ 

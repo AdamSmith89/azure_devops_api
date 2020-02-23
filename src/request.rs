@@ -6,7 +6,7 @@ use url::Url;
 use crate::azure_devops_client::AzureDevopsClient;
 use crate::errors::ApiError;
 
-#[derive(Debug)]
+#[derive(PartialEq, Debug)]
 pub enum Method {
     Get,
     Post,
@@ -16,23 +16,41 @@ pub enum Method {
 pub struct Request<T> {
     method: Method,
     url: Url,
+    body: String,
     phantom: PhantomData<T>,
 }
 
 impl<T> Request<T> {
-    pub fn new(method: Method, url: Url) -> Request<T> {
+    pub fn new(method: Method, url: Url, body: String) -> Request<T> {
         Request {
             method: method,
             url: url,
+            body: body,
             phantom: PhantomData,
         }
+    }
+
+    pub fn get_method(&self) -> &Method {
+        &self.method
+    }
+
+    pub fn get_url(&self) -> &Url {
+        &self.url
+    }
+
+    pub fn get_body(&self) -> &String {
+        &self.body
     }
 
     pub fn send(self, client: &AzureDevopsClient) -> Result<T, ApiError>
     where
         for<'de> T: Deserialize<'de>,
     {
-        let response = client.get(self.url)?;
+        let response = 
+            match self.method {
+                Method::Get => client.get(self.url)?,
+                Method::Post => client.post(self.url, self.body)?,
+            };
 
         if let Err(err) = response.error_for_status_ref() {
             return Err(err)?;
@@ -55,6 +73,7 @@ pub struct RequestBuilder<T> {
     resource_path: String,
     // api version?
     queries: Vec<Query>,
+    body: String,
     phantom: PhantomData<T>,
 }
 
@@ -63,10 +82,11 @@ impl<T> RequestBuilder<T> {
         RequestBuilder {
             method: method,
             resource_path: resource_path.to_owned(),
-            organization: String::from(""),
-            project: String::from(""),
-            team: String::from(""),
+            organization: String::new(),
+            project: String::new(),
+            team: String::new(),
             queries: Vec::new(),
+            body: String::new(),
             phantom: PhantomData,
         }
     }
@@ -94,6 +114,11 @@ impl<T> RequestBuilder<T> {
         self
     }
 
+    pub fn set_body(mut self, body: &str) -> RequestBuilder<T> {
+        self.body = body.to_owned();
+        self
+    }
+
     // TODO - set api version?
 
     pub fn build(mut self) -> Result<Request<T>, ApiError> {
@@ -113,7 +138,7 @@ impl<T> RequestBuilder<T> {
             url.query_pairs_mut().append_pair(&query.name, &query.value);
         }
 
-        Ok(Request::new(self.method, url))
+        Ok(Request::new(self.method, url, self.body))
     }
 
     // Shortcut to call .build() then Request::Send()

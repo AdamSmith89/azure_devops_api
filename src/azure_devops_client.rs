@@ -18,6 +18,8 @@ impl AzureDevopsClient {
         }
     }
 
+    // TODO: Can we still get the body of a response on a failed message?
+
     pub fn get(&self, url: Url) -> Result<reqwest::blocking::Response, ApiError> {
         let pat = ":".to_owned() + &self.pat;
         let auth_header = "Basic ".to_owned() + &base64::encode(&pat);
@@ -29,5 +31,15 @@ impl AzureDevopsClient {
             .send()?)
     }
 
-    // TODO: add support for POST
+    pub fn post(&self, url: Url, body: String) -> Result<reqwest::blocking::Response, ApiError> {
+        let pat = ":".to_owned() + &self.pat;
+        let auth_header = "Basic ".to_owned() + &base64::encode(&pat);
+
+        Ok(self.client
+            .post(url.as_str())
+            .header(reqwest::header::AUTHORIZATION, auth_header)
+            .header(reqwest::header::CONTENT_TYPE, "application/json")
+            .body(body)
+            .send()?)
+    }
 }
