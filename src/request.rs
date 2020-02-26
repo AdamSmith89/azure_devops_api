@@ -58,6 +58,13 @@ impl<T> Request<T> {
             return Err(err)?;
         }
 
+        if response.status() == reqwest::StatusCode::NO_CONTENT {
+            println!("No Content!");
+            
+            // TODO: What the heck should I return here?
+            return Ok(T::new());
+        }
+
         Ok(response.json::<T>()?)
     }
 }

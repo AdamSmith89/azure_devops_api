@@ -31,14 +31,19 @@ pub struct Attributes {
     pub time_frame: String,
 }
 
+#[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct EmptyResponse {
+}
+
 // TODO: This request doesn't return any JSON data! What should be used here ----v?
 // How can the request send by changed to maybe parse into json
-pub fn delete(organization: &str, project: &str, id: &str) -> RequestBuilder<Iteration> {
+pub fn delete(organization: &str, project: &str, id: &str) -> RequestBuilder<EmptyResponse> {
     let mut resource_path = PathBuf::new();
     resource_path.push("work/teamsettings/iterations");
     resource_path.push(id);
 
-    RequestBuilder::<Iteration>::new(Method::Delete, resource_path.to_str().unwrap())
+    RequestBuilder::<EmptyResponse>::new(Method::Delete, resource_path.to_str().unwrap())
         .set_organization(organization)
         .set_project(project)
 }
