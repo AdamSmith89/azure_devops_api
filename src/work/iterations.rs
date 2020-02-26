@@ -46,11 +46,7 @@ pub fn get(organization: &str, project: &str, id: &str) -> RequestBuilder<Iterat
         .set_project(project)
 }
 
-pub fn post_team_iteration(
-    organization: &str,
-    project: &str,
-    id: &str,
-) -> Result<RequestBuilder<Iteration>, ApiError> {
+pub fn post_team_iteration(organization: &str, project: &str, id: &str) -> Result<RequestBuilder<Iteration>, ApiError> {
     Ok(
         RequestBuilder::<Iteration>::new(Method::Post, "work/teamsettings/iterations")
             .set_organization(organization)

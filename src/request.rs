@@ -71,8 +71,9 @@ pub struct RequestBuilder<T> {
     project: String,
     team: String,
     resource_path: String,
-    // api version?
+    paths: Vec<String>,
     queries: Vec<Query>,
+    // api version?
     body: String,
     phantom: PhantomData<T>,
 }
@@ -85,6 +86,7 @@ impl<T> RequestBuilder<T> {
             organization: String::new(),
             project: String::new(),
             team: String::new(),
+            paths: Vec::new(),
             queries: Vec::new(),
             body: String::new(),
             phantom: PhantomData,
@@ -106,6 +108,11 @@ impl<T> RequestBuilder<T> {
         self
     }
 
+    pub fn add_path(mut self, path: &str) -> RequestBuilder<T> {
+        self.paths.push(path.to_owned());
+        self
+    }
+    
     pub fn add_query(mut self, name: &str, value: &str) -> RequestBuilder<T> {
         self.queries.push(Query {
             name: name.to_owned(),
@@ -134,6 +141,10 @@ impl<T> RequestBuilder<T> {
             .join("_apis/")?
             .join(&self.resource_path)?;
 
+        for path in self.paths {
+            url.join(&path)?;
+        }
+        
         for query in self.queries {
             url.query_pairs_mut().append_pair(&query.name, &query.value);
         }

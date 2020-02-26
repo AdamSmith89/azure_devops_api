@@ -49,11 +49,10 @@ pub struct Parent {
 
 // TODO: Path is an optional variable so shouldn't be required in the function call
 // TODO: Could replace structure_group with an enum - look into strum crate for converting to string
-pub fn create_or_update(organization: &str, project: &str, structure_group: &str, path: &str, body: &str) -> RequestBuilder<WorkItemClassificationNode> {
+pub fn create_or_update(organization: &str, project: &str, structure_group: &str, body: &str) -> RequestBuilder<WorkItemClassificationNode> {
     let mut resource_path = PathBuf::new();
     resource_path.push("wit/classificationnodes");
     resource_path.push(structure_group);
-    resource_path.push(path);
 
     RequestBuilder::<WorkItemClassificationNode>::new(Method::Post, resource_path.to_str().unwrap())
         .set_organization(organization)
@@ -61,11 +60,10 @@ pub fn create_or_update(organization: &str, project: &str, structure_group: &str
         .set_body(body)
 }
 
-pub fn get(organization: &str, project: &str, structure_group: &str, path: &str, body: &str) -> RequestBuilder<WorkItemClassificationNode> {
+pub fn get(organization: &str, project: &str, structure_group: &str, body: &str) -> RequestBuilder<WorkItemClassificationNode> {
     let mut resource_path = PathBuf::new();
     resource_path.push("wit/classificationnodes");
     resource_path.push(structure_group);
-    resource_path.push(path);
 
     RequestBuilder::<WorkItemClassificationNode>::new(Method::Get, resource_path.to_str().unwrap())
         .set_organization(organization)
