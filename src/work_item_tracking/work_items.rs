@@ -9,12 +9,12 @@ use crate::request::Method;
 pub struct ListWorkItems {
     pub count: i64,
     #[serde(rename = "value")]
-    pub work_items: Vec<Value>,
+    pub work_items: Vec<WorkItem>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Value {
+pub struct WorkItem {
     pub id: i64,
     pub rev: i64,
     pub fields: Fields,
@@ -103,40 +103,16 @@ pub struct SystemCreatedBy {
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Links {
-    pub avatar: Avatar,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Avatar {
-    pub href: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct SystemChangedBy {
     pub display_name: String,
     pub url: String,
     #[serde(rename = "_links")]
-    pub links: Links2,
+    pub links: Links,
     pub id: String,
     pub unique_name: String,
     pub image_url: String,
     pub inactive: Option<bool>,
     pub descriptor: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Links2 {
-    pub avatar: Avatar2,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Avatar2 {
-    pub href: String,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -145,7 +121,7 @@ pub struct SystemAssignedTo {
     pub display_name: String,
     pub url: String,
     #[serde(rename = "_links")]
-    pub links: Links3,
+    pub links: Links,
     pub id: String,
     pub unique_name: String,
     pub image_url: String,
@@ -155,13 +131,13 @@ pub struct SystemAssignedTo {
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Links3 {
-    pub avatar: Avatar3,
+pub struct Links {
+    pub avatar: Avatar,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Avatar3 {
+pub struct Avatar {
     pub href: String,
 }
 

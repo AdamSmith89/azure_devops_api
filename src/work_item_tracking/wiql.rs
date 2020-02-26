@@ -11,7 +11,7 @@ pub struct QueryResult {
     pub query_result_type: String,
     pub as_of: String,
     pub columns: Vec<Column>,
-    pub work_items: Vec<WorkItem>,
+    pub work_items: Vec<WorkItemReference>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -24,7 +24,7 @@ pub struct Column {
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct WorkItem {
+pub struct WorkItemReference {
     pub id: i64,
     pub url: String,
 }

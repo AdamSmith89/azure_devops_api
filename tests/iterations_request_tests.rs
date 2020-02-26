@@ -1,5 +1,5 @@
-use azure_devops_api::work::iterations::{Iteration, Attributes, get, post_team_iteration};
-use azure_devops_api::request::{Method};
+use azure_devops_api::request::Method;
+use azure_devops_api::work::iterations::post_team_iteration;
 
 #[test]
 fn post_team_iteration_then_build() {
