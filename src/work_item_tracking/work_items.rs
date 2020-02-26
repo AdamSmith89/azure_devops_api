@@ -1,10 +1,10 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
 use crate::request::RequestBuilder;
 use crate::request::Method;
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ListWorkItems {
     pub count: i64,
@@ -12,7 +12,7 @@ pub struct ListWorkItems {
     pub work_items: Vec<WorkItem>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct WorkItem {
     pub id: i64,
@@ -22,7 +22,7 @@ pub struct WorkItem {
     pub comment_version_ref: Option<CommentVersionRef>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Fields {
     #[serde(rename = "System.AreaPath")]
@@ -87,7 +87,7 @@ pub struct Fields {
     pub microsoft_vsts_build_integration_build: Option<String>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SystemCreatedBy {
     pub display_name: String,
@@ -101,7 +101,7 @@ pub struct SystemCreatedBy {
     pub descriptor: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SystemChangedBy {
     pub display_name: String,
@@ -115,7 +115,7 @@ pub struct SystemChangedBy {
     pub descriptor: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SystemAssignedTo {
     pub display_name: String,
@@ -129,19 +129,19 @@ pub struct SystemAssignedTo {
     pub descriptor: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Links {
     pub avatar: Avatar,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Avatar {
     pub href: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CommentVersionRef {
     pub comment_id: i64,

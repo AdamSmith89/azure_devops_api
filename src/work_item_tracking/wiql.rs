@@ -1,10 +1,10 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
 use crate::request::RequestBuilder;
 use crate::request::Method;
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryResult {
     pub query_type: String,
@@ -14,7 +14,7 @@ pub struct QueryResult {
     pub work_items: Vec<WorkItemReference>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Column {
     pub reference_name: String,
@@ -22,7 +22,7 @@ pub struct Column {
     pub url: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct WorkItemReference {
     pub id: i64,

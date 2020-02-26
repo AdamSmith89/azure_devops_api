@@ -5,7 +5,7 @@ use crate::errors::ApiError;
 use crate::request::Method;
 use crate::request::RequestBuilder;
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ListIterations {
     pub count: i64,
