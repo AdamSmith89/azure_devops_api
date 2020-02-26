@@ -47,7 +47,6 @@ pub struct Parent {
     pub href: String,
 }
 
-// TODO: Path is an optional variable so shouldn't be required in the function call
 // TODO: Could replace structure_group with an enum - look into strum crate for converting to string
 pub fn create_or_update(organization: &str, project: &str, structure_group: &str, body: &str) -> RequestBuilder<WorkItemClassificationNode> {
     let mut resource_path = PathBuf::new();
