@@ -60,11 +60,6 @@ impl<T> Request<T> {
     }
 }
 
-struct Query {
-    name: String,
-    value: String,
-}
-
 pub struct RequestBuilder<T> {
     method: Method,
     organization: String,
@@ -72,7 +67,7 @@ pub struct RequestBuilder<T> {
     team: String,
     resource_path: String,
     paths: Vec<String>,
-    queries: Vec<Query>,
+    queries: Vec<(String, String)>,
     // api version?
     body: String,
     phantom: PhantomData<T>,
@@ -114,10 +109,7 @@ impl<T> RequestBuilder<T> {
     }
     
     pub fn add_query(mut self, name: &str, value: &str) -> RequestBuilder<T> {
-        self.queries.push(Query {
-            name: name.to_owned(),
-            value: value.to_owned(),
-        });
+        self.queries.push((name.to_owned(), value.to_owned()));
         self
     }
 
@@ -128,12 +120,7 @@ impl<T> RequestBuilder<T> {
 
     // TODO - set api version?
 
-    pub fn build(mut self) -> Result<Request<T>, ApiError> {
-        self.queries.push(Query {
-            name: String::from("api-version"),
-            value: String::from("5.1"),
-        });
-
+    pub fn build(self) -> Result<Request<T>, ApiError> {
         let mut url = Url::parse("https://dev.azure.com")?
             .join(&self.organization)?
             .join(&self.project)?
@@ -141,13 +128,10 @@ impl<T> RequestBuilder<T> {
             .join("_apis/")?
             .join(&self.resource_path)?;
 
-        for path in self.paths {
-            url.join(&path)?;
-        }
-        
-        for query in self.queries {
-            url.query_pairs_mut().append_pair(&query.name, &query.value);
-        }
+        url.path_segments_mut().unwrap().extend(self.paths.into_iter());
+        url.query_pairs_mut()
+            .extend_pairs(self.queries.into_iter())
+            .append_pair("api-version", "5.1");
 
         Ok(Request::new(self.method, url, self.body))
     }
@@ -170,65 +154,91 @@ mod tests {
 
     #[test]
     fn requestbuilder_build_basic() {
-        let request_builder = RequestBuilder::<i32>::new(Method::Get, "fake_path");
+        let request_builder = RequestBuilder::<i32>::new(Method::Get, "fake_resource");
         let actual_request = request_builder.build();
 
         assert_eq!(
             actual_request.unwrap().url.as_str(),
-            "https://dev.azure.com/_apis/fake_path?api-version=5.1"
+            "https://dev.azure.com/_apis/fake_resource?api-version=5.1"
         );
     }
 
     #[test]
     fn requestbuilder_build_with_organization_only() {
-        let request_builder = RequestBuilder::<i32>::new(Method::Get, "fake_path").set_organization("fake_org");
+        let request_builder = RequestBuilder::<i32>::new(Method::Get, "fake_resource").set_organization("fake_org");
         let actual_request = request_builder.build();
 
         assert_eq!(
             actual_request.unwrap().url.as_str(),
-            "https://dev.azure.com/fake_org/_apis/fake_path?api-version=5.1"
+            "https://dev.azure.com/fake_org/_apis/fake_resource?api-version=5.1"
         );
     }
 
     #[test]
     fn requestbuilder_build_with_team_only() {
-        let request_builder = RequestBuilder::<i32>::new(Method::Get, "fake_path").set_team("fake_team");
+        let request_builder = RequestBuilder::<i32>::new(Method::Get, "fake_resource").set_team("fake_team");
         let actual_request = request_builder.build();
 
         assert_eq!(
             actual_request.unwrap().url.as_str(),
-            "https://dev.azure.com/fake_team/_apis/fake_path?api-version=5.1"
+            "https://dev.azure.com/fake_team/_apis/fake_resource?api-version=5.1"
         );
     }
 
     #[test]
     fn requestbuilder_build_with_organization_and_team() {
-        let request_builder = RequestBuilder::<i32>::new(Method::Get, "fake_path")
+        let request_builder = RequestBuilder::<i32>::new(Method::Get, "fake_resource")
             .set_organization("fake_org")
             .set_team("fake_team");
         let actual_request = request_builder.build();
 
         assert_eq!(
             actual_request.unwrap().url.as_str(),
-            "https://dev.azure.com/fake_org/fake_team/_apis/fake_path?api-version=5.1"
+            "https://dev.azure.com/fake_org/fake_team/_apis/fake_resource?api-version=5.1"
+        );
+    }
+
+    #[test]
+    fn requestbuilder_build_with_path() {
+        let request_builder =
+            RequestBuilder::<i32>::new(Method::Get, "fake_resource").add_path("fake_path");
+        let actual_request = request_builder.build();
+
+        assert_eq!(
+            actual_request.unwrap().url.as_str(),
+            "https://dev.azure.com/_apis/fake_resource/fake_path?api-version=5.1"
+        );
+    }
+
+    #[test]
+    fn requestbuilder_build_with_multiple_paths() {
+        let request_builder = RequestBuilder::<i32>::new(Method::Get, "fake_resource")
+            .add_path("fake_path1")
+            .add_path("fake_path2")
+            .add_path("fake_path3");
+        let actual_request = request_builder.build();
+
+        assert_eq!(
+            actual_request.unwrap().url.as_str(),
+            "https://dev.azure.com/_apis/fake_resource/fake_path1/fake_path2/fake_path3?api-version=5.1"
         );
     }
 
     #[test]
     fn requestbuilder_build_with_query() {
         let request_builder =
-            RequestBuilder::<i32>::new(Method::Get, "fake_path").add_query("fake_query", "fake_value");
+            RequestBuilder::<i32>::new(Method::Get, "fake_resource").add_query("fake_query", "fake_value");
         let actual_request = request_builder.build();
 
         assert_eq!(
             actual_request.unwrap().url.as_str(),
-            "https://dev.azure.com/_apis/fake_path?fake_query=fake_value&api-version=5.1"
+            "https://dev.azure.com/_apis/fake_resource?fake_query=fake_value&api-version=5.1"
         );
     }
 
     #[test]
     fn requestbuilder_build_with_multiple_queries() {
-        let request_builder = RequestBuilder::<i32>::new(Method::Get, "fake_path")
+        let request_builder = RequestBuilder::<i32>::new(Method::Get, "fake_resource")
             .add_query("fake_query1", "fake_value1")
             .add_query("fake_query2", "fake_value2")
             .add_query("fake_query3", "fake_value3");
@@ -236,13 +246,13 @@ mod tests {
 
         assert_eq!(
             actual_request.unwrap().url.as_str(),
-            "https://dev.azure.com/_apis/fake_path?fake_query1=fake_value1&fake_query2=fake_value2&fake_query3=fake_value3&api-version=5.1"
+            "https://dev.azure.com/_apis/fake_resource?fake_query1=fake_value1&fake_query2=fake_value2&fake_query3=fake_value3&api-version=5.1"
         );
     }
 
     #[test]
     fn requestbuilder_build_all_segments() {
-        let request_builder = RequestBuilder::<i32>::new(Method::Get, "fake_path")
+        let request_builder = RequestBuilder::<i32>::new(Method::Get, "fake_resource")
             .set_organization("fake_org")
             .set_team("fake_team")
             .add_query("fake_query1", "fake_value1")
@@ -252,7 +262,7 @@ mod tests {
 
         assert_eq!(
             actual_request.unwrap().url.as_str(),
-            "https://dev.azure.com/fake_org/fake_team/_apis/fake_path?fake_query1=fake_value1&fake_query2=fake_value2&fake_query3=fake_value3&api-version=5.1"
+            "https://dev.azure.com/fake_org/fake_team/_apis/fake_resource?fake_query1=fake_value1&fake_query2=fake_value2&fake_query3=fake_value3&api-version=5.1"
         );
     }
 }
