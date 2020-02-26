@@ -31,8 +31,14 @@ pub struct Attributes {
     pub time_frame: String,
 }
 
-pub fn list(organization: &str, project: &str) -> RequestBuilder<ListIterations> {
-    RequestBuilder::<ListIterations>::new(Method::Get, "work/teamsettings/iterations")
+// TODO: This request doesn't return any JSON data! What should be used here ----v?
+// How can the request send by changed to maybe parse into json
+pub fn delete(organization: &str, project: &str, id: &str) -> RequestBuilder<Iteration> {
+    let mut resource_path = PathBuf::new();
+    resource_path.push("work/teamsettings/iterations");
+    resource_path.push(id);
+
+    RequestBuilder::<Iteration>::new(Method::Delete, resource_path.to_str().unwrap())
         .set_organization(organization)
         .set_project(project)
 }
@@ -41,7 +47,14 @@ pub fn get(organization: &str, project: &str, id: &str) -> RequestBuilder<Iterat
     let mut resource_path = PathBuf::new();
     resource_path.push("work/teamsettings/iterations");
     resource_path.push(id);
+
     RequestBuilder::<Iteration>::new(Method::Get, resource_path.to_str().unwrap())
+        .set_organization(organization)
+        .set_project(project)
+}
+
+pub fn list(organization: &str, project: &str) -> RequestBuilder<ListIterations> {
+    RequestBuilder::<ListIterations>::new(Method::Get, "work/teamsettings/iterations")
         .set_organization(organization)
         .set_project(project)
 }
@@ -55,4 +68,3 @@ pub fn post_team_iteration(organization: &str, project: &str, id: &str) -> Resul
             //serde_json::to_string(&iteration)?.as_str()
     )
 }
- 

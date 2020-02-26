@@ -42,4 +42,15 @@ impl AzureDevopsClient {
             .body(body)
             .send()?)
     }
+
+    pub fn delete(&self, url: Url) -> Result<reqwest::blocking::Response, ApiError> {
+        let pat = ":".to_owned() + &self.pat;
+        let auth_header = "Basic ".to_owned() + &base64::encode(&pat);
+
+        Ok(self.client
+            .delete(url.as_str())
+            .header(reqwest::header::AUTHORIZATION, auth_header)
+            .header(reqwest::header::CONTENT_TYPE, "application/json")
+            .send()?)
+    }
 }

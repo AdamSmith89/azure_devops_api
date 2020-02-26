@@ -8,6 +8,7 @@ use crate::errors::ApiError;
 
 #[derive(PartialEq, Debug)]
 pub enum Method {
+    Delete,
     Get,
     Post,
 }
@@ -48,6 +49,7 @@ impl<T> Request<T> {
     {
         let response = 
             match self.method {
+                Method::Delete => client.delete(self.url)?,
                 Method::Get => client.get(self.url)?,
                 Method::Post => client.post(self.url, self.body)?,
             };
