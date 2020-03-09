@@ -78,7 +78,7 @@ fn main() {
   - Iterations
     - [Delete](https://docs.microsoft.com/en-us/rest/api/azure/devops/work/iterations/delete?view=azure-devops-rest-5.1)
     - [Get](https://docs.microsoft.com/en-us/rest/api/azure/devops/work/iterations/get?view=azure-devops-rest-5.1)
-    - :X: [Get Iteration Work Items](https://docs.microsoft.com/en-us/rest/api/azure/devops/work/iterations/get%20iteration%20work%20items?view=azure-devops-rest-5.1)
+    - :x: [Get Iteration Work Items](https://docs.microsoft.com/en-us/rest/api/azure/devops/work/iterations/get%20iteration%20work%20items?view=azure-devops-rest-5.1)
     - [List](https://docs.microsoft.com/en-us/rest/api/azure/devops/work/iterations/list?view=azure-devops-rest-5.1)
     - [Post Team Iteration](https://docs.microsoft.com/en-us/rest/api/azure/devops/work/iterations/post%20team%20iteration?view=azure-devops-rest-5.1)
 - Work Item Tracking
@@ -86,21 +86,21 @@ fn main() {
     - [Create Or Update](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/classification%20nodes/create%20or%20update?view=azure-devops-rest-5.1)
     - [Delete](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/classification%20nodes/delete?view=azure-devops-rest-5.1)
     - [Get](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/classification%20nodes/get?view=azure-devops-rest-5.1)
-    - :X: [Get Classification Nodes](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/classification%20nodes/get%20classification%20nodes?view=azure-devops-rest-5.1)
-    - :X: [Get Root Nodes](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/classification%20nodes/get%20root%20nodes?view=azure-devops-rest-5.1)
-    - :X: [Update](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/classification%20nodes/update?view=azure-devops-rest-5.1)
+    - :x: [Get Classification Nodes](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/classification%20nodes/get%20classification%20nodes?view=azure-devops-rest-5.1)
+    - :x: [Get Root Nodes](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/classification%20nodes/get%20root%20nodes?view=azure-devops-rest-5.1)
+    - :x: [Update](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/classification%20nodes/update?view=azure-devops-rest-5.1)
   - Wiql
-    - :X: [Get](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/wiql/get?view=azure-devops-rest-5.1)
+    - :x: [Get](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/wiql/get?view=azure-devops-rest-5.1)
     - [Query By Id](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/wiql/query%20by%20id?view=azure-devops-rest-5.1)
-    - :X: [Query By Wiql](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/wiql/query%20by%20wiql?view=azure-devops-rest-5.1)
+    - :x: [Query By Wiql](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/wiql/query%20by%20wiql?view=azure-devops-rest-5.1)
   - Work Items
-    - :X: [Create](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/work%20items/create?view=azure-devops-rest-5.1)
-    - :X: [Delete](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/work%20items/delete?view=azure-devops-rest-5.1)
-    - :X: [Get Work Item](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/work%20items/get%20work%20item?view=azure-devops-rest-5.1)
-    - :X: [Get Work Item Template](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/work%20items/get%20work%20item%20template?view=azure-devops-rest-5.1)
-    - :X: [Get Work Items Batch](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/work%20items/get%20work%20items%20batch?view=azure-devops-rest-5.1)
+    - :x: [Create](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/work%20items/create?view=azure-devops-rest-5.1)
+    - :x: [Delete](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/work%20items/delete?view=azure-devops-rest-5.1)
+    - :x: [Get Work Item](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/work%20items/get%20work%20item?view=azure-devops-rest-5.1)
+    - :x: [Get Work Item Template](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/work%20items/get%20work%20item%20template?view=azure-devops-rest-5.1)
+    - :x: [Get Work Items Batch](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/work%20items/get%20work%20items%20batch?view=azure-devops-rest-5.1)
     - [List](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/work%20items/list?view=azure-devops-rest-5.1)
-    - :X: [Update](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/work%20items/update?view=azure-devops-rest-5.1)
+    - :x: [Update](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/work%20items/update?view=azure-devops-rest-5.1)
 ## Unsupported APIs
 APIs that have yet to be supported can be performed directly through the `AzureDevopsClient` itself. Deserialization will have to be performed manually.
 ```rust
@@ -109,9 +109,5 @@ let json: some_struct = client.get(Url::parse("https://dev.azure.com/...")?)?.js
 The `get` method takes a `url::Url` and returns a `Result<reqwest::blocking::response, ApiError>`. The [reqwest](https://crates.io/crates/reqwest) library supports deserialization through [serde_json](https://crates.io/crates/serde_json) using the `json` function.
 
 # TODO
-- Add support for post
 - Support custom fields
 - Add features for the different services/categories?
-- Add more APIs
-- [Add OAuth support](https://docs.microsoft.com/en-us/azure/devops/integrate/get-started/authentication/oauth?view=azure-devops)
-  - `Bearer {access_token}` instead of `Basic {:PAT}`
