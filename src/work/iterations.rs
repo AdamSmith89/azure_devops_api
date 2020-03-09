@@ -4,6 +4,7 @@ use std::path::PathBuf;
 use crate::errors::ApiError;
 use crate::request::Method;
 use crate::request::RequestBuilder;
+use crate::request::NoContentResponse;
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -31,19 +32,12 @@ pub struct Attributes {
     pub time_frame: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct EmptyResponse {
-}
-
-// TODO: This request doesn't return any JSON data! What should be used here ----v?
-// How can the request send by changed to maybe parse into json
-pub fn delete(organization: &str, project: &str, id: &str) -> RequestBuilder<EmptyResponse> {
+pub fn delete(organization: &str, project: &str, id: &str) -> RequestBuilder<NoContentResponse> {
     let mut resource_path = PathBuf::new();
     resource_path.push("work/teamsettings/iterations");
     resource_path.push(id);
 
-    RequestBuilder::<EmptyResponse>::new(Method::Delete, resource_path.to_str().unwrap())
+    RequestBuilder::<NoContentResponse>::new(Method::Delete, resource_path.to_str().unwrap())
         .set_organization(organization)
         .set_project(project)
 }
@@ -70,6 +64,5 @@ pub fn post_team_iteration(organization: &str, project: &str, id: &str) -> Resul
             .set_organization(organization)
             .set_project(project)
             .set_body(format!("{{\"id\":\"{}\"}}", id).as_str())
-            //serde_json::to_string(&iteration)?.as_str()
     )
 }

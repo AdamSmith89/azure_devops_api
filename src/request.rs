@@ -1,10 +1,16 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::marker::PhantomData;
 use std::ops::Add;
 use url::Url;
 
 use crate::azure_devops_client::AzureDevopsClient;
 use crate::errors::ApiError;
+
+// Dummy struct that can be used for queries which return 204 (No Content)
+#[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct NoContentResponse {
+}
 
 #[derive(PartialEq, Debug)]
 pub enum Method {
@@ -21,7 +27,7 @@ pub struct Request<T> {
     phantom: PhantomData<T>,
 }
 
-impl<T> Request<T> {
+impl<T: std::default::Default> Request<T> {
     pub fn new(method: Method, url: Url, body: String) -> Request<T> {
         Request {
             method: method,
@@ -46,6 +52,7 @@ impl<T> Request<T> {
     pub fn send(self, client: &AzureDevopsClient) -> Result<T, ApiError>
     where
         for<'de> T: Deserialize<'de>,
+        T: std::default::Default
     {
         let response = 
             match self.method {
@@ -59,10 +66,7 @@ impl<T> Request<T> {
         }
 
         if response.status() == reqwest::StatusCode::NO_CONTENT {
-            println!("No Content!");
-            
-            // TODO: What the heck should I return here?
-            return Ok(T::new());
+            return Ok(T::default());
         }
 
         Ok(response.json::<T>()?)
@@ -82,7 +86,7 @@ pub struct RequestBuilder<T> {
     phantom: PhantomData<T>,
 }
 
-impl<T> RequestBuilder<T> {
+impl<T: std::default::Default> RequestBuilder<T> {
     pub fn new(method: Method, resource_path: &str) -> RequestBuilder<T> {
         RequestBuilder {
             method: method,
