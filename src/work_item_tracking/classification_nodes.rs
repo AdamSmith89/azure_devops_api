@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
 use crate::request::Method;
+use crate::request::NoContentResponse;
 use crate::request::RequestBuilder;
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
@@ -48,7 +49,12 @@ pub struct Parent {
 }
 
 // TODO: Could replace structure_group with an enum - look into strum crate for converting to string
-pub fn create_or_update(organization: &str, project: &str, structure_group: &str, body: &str) -> RequestBuilder<WorkItemClassificationNode> {
+pub fn create_or_update(
+    organization: &str,
+    project: &str,
+    structure_group: &str,
+    body: &str,
+) -> RequestBuilder<WorkItemClassificationNode> {
     let mut resource_path = PathBuf::new();
     resource_path.push("wit/classificationnodes");
     resource_path.push(structure_group);
@@ -59,7 +65,26 @@ pub fn create_or_update(organization: &str, project: &str, structure_group: &str
         .set_body(body)
 }
 
-pub fn get(organization: &str, project: &str, structure_group: &str, body: &str) -> RequestBuilder<WorkItemClassificationNode> {
+pub fn delete(
+    organization: &str,
+    project: &str,
+    structure_group: &str,
+) -> RequestBuilder<NoContentResponse> {
+    let mut resource_path = PathBuf::new();
+    resource_path.push("wit/classificationnodes");
+    resource_path.push(structure_group);
+
+    RequestBuilder::<NoContentResponse>::new(Method::Delete, resource_path.to_str().unwrap())
+        .set_organization(organization)
+        .set_project(project)
+}
+
+pub fn get(
+    organization: &str,
+    project: &str,
+    structure_group: &str,
+    body: &str,
+) -> RequestBuilder<WorkItemClassificationNode> {
     let mut resource_path = PathBuf::new();
     resource_path.push("wit/classificationnodes");
     resource_path.push(structure_group);

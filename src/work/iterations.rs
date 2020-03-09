@@ -3,8 +3,8 @@ use std::path::PathBuf;
 
 use crate::errors::ApiError;
 use crate::request::Method;
-use crate::request::RequestBuilder;
 use crate::request::NoContentResponse;
+use crate::request::RequestBuilder;
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -58,11 +58,15 @@ pub fn list(organization: &str, project: &str) -> RequestBuilder<ListIterations>
         .set_project(project)
 }
 
-pub fn post_team_iteration(organization: &str, project: &str, id: &str) -> Result<RequestBuilder<Iteration>, ApiError> {
+pub fn post_team_iteration(
+    organization: &str,
+    project: &str,
+    id: &str,
+) -> Result<RequestBuilder<Iteration>, ApiError> {
     Ok(
         RequestBuilder::<Iteration>::new(Method::Post, "work/teamsettings/iterations")
             .set_organization(organization)
             .set_project(project)
-            .set_body(format!("{{\"id\":\"{}\"}}", id).as_str())
+            .set_body(format!("{{\"id\":\"{}\"}}", id).as_str()),
     )
 }
